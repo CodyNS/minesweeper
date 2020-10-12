@@ -1,0 +1,25 @@
+your game must be fully playable from start to finish, on desktop and on mobile devices!!!
+
+your game must detect winning/losing condition and display appropriate message
+
+left-click / tap will uncover a square
+
+right-click / long-tap will mark/unmark a mine (long tap = tap with duration of 1s or longer)
+
+your game will ignore invalid moves (tapping an uncovered or marked square, or marking an uncovered square)
+
+tapping an uncovered square will recursively reveal all adjacent uncovered squares
+
+users should be able to select between 2 difficulty levels (choose the same as google's minesweeper)
+
+display elapsed time and remaining mine count
+
+on devices in landscape mode, your game should be centered in the browser window, with width of at most 800px 
+
+on devices in portrait mode, your game should occupy full width of the screen
+
+first move should be guaranteed to land on an empty square
+
+you must host your game publicly - make sure it is accessible to public by testing it from a private browser window!!!
+
+you can host your game on CPSC machines or any other public website
