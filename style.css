@@ -1,0 +1,26 @@
+* {
+    padding: 0;
+    margin: 0;
+}
+body {
+    background: #333;
+}
+.status-header {
+    background: rgb(156, 218, 156);
+    height: 50px;
+    width: 100%;
+    text-align: center;
+    line-height: 50px;
+    border-bottom: 1px solid black;
+}
+.game-board {
+    margin: 0 auto;
+    max-width: 800px;
+    height: 700px;
+    background: rgb(80, 80, 80);
+}
+.cell {
+    float: left;
+    text-align: center;
+    font-weight: 900;
+}

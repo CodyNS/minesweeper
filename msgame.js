@@ -25,7 +25,7 @@ let MSGame = (function(){
 
   class _MSGame {
     constructor() {
-      this.init(8,10,10); // easy
+      this.init(8,10,10); // easy (rows, cols, #mines)
     }
 
     validCoord(row, col) {
@@ -40,12 +40,12 @@ let MSGame = (function(){
       this.nuncovered = 0;
       this.exploded = false;
       // create an array
-      this.arr = array2d(
+      this.arr = array2d(  // Q: what's that last val? Anon function??
         nrows, ncols,
         () => ({mine: false, state: STATE_HIDDEN, count: 0}));
     }
 
-    count(row,col) {
+    count(row,col) { // returns the count number for an input square
       const c = (r,c) =>
             (this.validCoord(r,c) && this.arr[r][c].mine ? 1 : 0);
       let res = 0;
@@ -54,8 +54,11 @@ let MSGame = (function(){
           res += c(row+dr,col+dc);
       return res;
     }
+
     sprinkleMines(row, col) {
         // prepare a list of allowed coordinates for mine placement
+        // Looks like it makes sure they are placed > 2 spaces away
+        // ... from input args: row,col (an initial clicK x,y, perhaps?)
       let allowed = [];
       for(let r = 0 ; r < this.nrows ; r ++ ) {
         for( let c = 0 ; c < this.ncols ; c ++ ) {
@@ -66,7 +69,7 @@ let MSGame = (function(){
       this.nmines = Math.min(this.nmines, allowed.length);
       for( let i = 0 ; i < this.nmines ; i ++ ) {
         let j = rndInt(i, allowed.length-1);
-        [allowed[i], allowed[j]] = [allowed[j], allowed[i]];
+        [allowed[i], allowed[j]] = [allowed[j], allowed[i]]; // wtf is this? a swap?
         let [r,c] = allowed[i];
         this.arr[r][c].mine = true;
       }
@@ -93,8 +96,9 @@ let MSGame = (function(){
       console.log("Mines and counts after sprinkling:");
       console.log(mines.join("\n"), "\n");
     }
-    // puts a flag on a cell
-    // this is the 'right-click' or 'long-tap' functionality
+
+    // uncovers a cell at a given coordinate
+    // this is the 'left-click' functionality
     uncover(row, col) {
       console.log("uncover", row, col);
       // if coordinates invalid, refuse this request
@@ -123,8 +127,9 @@ let MSGame = (function(){
       }
       return true;
     }
-    // uncovers a cell at a given coordinate
-    // this is the 'left-click' functionality
+
+    // puts a flag on a cell
+    // this is the 'right-click' or 'long-tap' functionality
     mark(row, col) {
       console.log("mark", row, col);
       // if coordinates invalid, refuse this request
@@ -138,6 +143,7 @@ let MSGame = (function(){
         STATE_HIDDEN : STATE_MARKED;
       return true;
     }
+
     // returns array of strings representing the rendering of the board
     //      "H" = hidden cell - no bomb
     //      "F" = hidden cell with a mark / flag
@@ -172,7 +178,7 @@ let MSGame = (function(){
         nmines: this.nmines
       }
     }
-  }
+  } // class _MSGame
 
   return _MSGame;
 
@@ -181,20 +187,104 @@ let MSGame = (function(){
 let game = new MSGame();
 
 game.init(8, 10, 10);
-console.log(game.getRendering().join("\n"));
-console.log(game.getStatus());
+// console.log(game.getRendering().join("\n"));
+// console.log(game.getStatus());
 
-game.uncover(2,5);
-console.log(game.getRendering().join("\n"));
-console.log(game.getStatus());
+// game.uncover(2,5);
+// console.log(game.getRendering().join("\n"));
+// console.log(game.getStatus());
 
-game.uncover(5,5);
-console.log(game.getRendering().join("\n"));
-console.log(game.getStatus());
+// game.uncover(5,5);
+// console.log(game.getRendering().join("\n"));
+// console.log(game.getStatus());
 
-game.mark(4,5);
-console.log(game.getRendering().join("\n"));
-console.log(game.getStatus());
+// game.mark(4,5);
+// console.log(game.getRendering().join("\n"));
+// console.log(game.getStatus());
 
 
-console.log("end");
+// MY STUFF -------------------------------------------------------------------
+function drawAndWireUpGameBoard(rows, cols) {
+  let boardSpace = document.querySelector(".game-board");
+  const boardWidth = boardSpace.offsetWidth;
+  const boardHeight = boardSpace.offsetHeight;
+  const cellWidth = boardWidth / cols;
+  const cellHeight = boardHeight / rows;
+
+
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+        const color = (i+j) % 2 === 0 ? "#aad751" : "#a2d149";
+        let newCell = `<div id="cell${i}-${j}" class="cell" 
+                            style="width: ${cellWidth}px; 
+                            height: ${cellHeight}px;
+                            line-height: ${cellHeight}px;
+                            font-size: ${cellHeight}px; 
+                            background: ${color}" 
+                            data-row=${i} data-col=${j}></div>`;
+        // boardSpace.innerHTML += newCell;  // used to just do this
+        // but turning newCell into an actual element first...
+        let template = document.createElement('template'); // BLAH cite
+        newCell = newCell.trim();
+        template.innerHTML = newCell;
+        newCell = template.content.firstChild;
+        // ...lets us attach an event handler to it right away
+        newCell.addEventListener('click', function() { // shit - just call the funciton itself
+          game.uncover(newCell.dataset.row, newCell.dataset.col);
+          updateBoard(rows, cols);
+          const status = game.getStatus();
+          if (status.exploded)
+            alert("KABOOM! Game over :(");
+          else if (status.done)
+            alert("You Win! WOOHOO!!");
+        });
+        newCell.addEventListener('contextmenu', function() { // shit - just call the funciton itself
+          game.mark(newCell.dataset.row, newCell.dataset.col);
+          updateBoard(rows, cols);
+        });
+        // ...before we add it to the game board
+        boardSpace.appendChild(newCell);
+    } // j
+  } // i 
+} // f
+drawAndWireUpGameBoard(8,10);
+
+
+function updateBoard(rows, cols) {
+  let board = game.getRendering();
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      let cell = document.querySelector(`#cell${i}-${j}`);
+      const content = board[i][j];
+
+      if (content === "M")
+        cell.style.background = "black";
+      else if (content === "H")
+        console.log("placeholder code for now");
+      else if (content === "F")
+        cell.style.background = "red";
+      else { // number
+        cell.style.background = (i+j) % 2 === 0 ? "#e5c29f" : "#d7b899";
+        if (content !== "0") {
+          cell.innerText = content;
+        if (content === "1")
+            cell.style.color = "blue";
+        else if (content === "2")
+            cell.style.color = "green";
+        else if (content === '3')
+            cell.style.color = "green";
+        else if (content === '4')
+          cell.style.color = "purple";
+        }
+      }
+    } // j
+  } // i
+} // f
+
+
+
+
+
+// END OF MY STUFF ------------------------------------------------------------
+
+//console.log("end");
