@@ -23,3 +23,36 @@ first move should be guaranteed to land on an empty square
 you must host your game publicly - make sure it is accessible to public by testing it from a private browser window!!!
 
 you can host your game on CPSC machines or any other public website
+
+
+
+
+
+------- to do + notes ------------
+
+
+format the timer
+make timer activate and stop on game start/stop
+difficulty selector
+restart button
+win condition - freeze the game
+lose condition - freeze the game
+fix the clicking on top row issue! wtf?
+
+sound effects. I fucking want sound effects!! GET EM!!!
+
+
+
+
+
+nrows
+ncols
+nmines
+nmarked
+nuncovered
+
+exploded
+
+arr[][] contains: mine: (bool), state: (String), count: (num)
+
+ 

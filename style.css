@@ -3,7 +3,11 @@
     margin: 0;
 }
 body {
-    background: #333;
+    background: #292d3e;
+}
+img {
+    width: 100%;
+    height: 100%;
 }
 .status-header {
     background: rgb(156, 218, 156);
@@ -16,11 +20,12 @@ body {
 .game-board {
     margin: 0 auto;
     max-width: 800px;
-    height: 700px;
+    height: 622px; /* 0.8 for easy, 0.77777 for med, ? for hard */
     background: rgb(80, 80, 80);
 }
 .cell {
     float: left;
     text-align: center;
     font-weight: 900;
+    background-size: 100% 100% !important;
 }

@@ -186,7 +186,8 @@ let MSGame = (function(){
 
 let game = new MSGame();
 
-game.init(8, 10, 10);
+game.init(14, 18, 40);  // medium game
+//game.init(8, 10, 10);  // easy game
 // console.log(game.getRendering().join("\n"));
 // console.log(game.getStatus());
 
@@ -201,6 +202,43 @@ game.init(8, 10, 10);
 // game.mark(4,5);
 // console.log(game.getRendering().join("\n"));
 // console.log(game.getStatus());
+
+
+// Timer code by Dakshyani
+let ss = document.querySelectorAll('.timer');
+[].forEach.call(ss, function(s) {
+    let currentTime = 0,
+        interval = 0,
+        lastUpdateTime = new Date().getTime(),
+        start = s.querySelector('button.start'),
+        stop = s.querySelector('button.stop'),
+        secs = s.querySelector('span.seconds');
+
+    start.addEventListener('click', startTimer);
+    stop.addEventListener('click', stopTimer);
+
+    function pad(n) {
+        return ('00' + n).substr(-2);
+    }
+    function update(){
+        let now = new Date().getTime(),
+            dt = now - lastUpdateTime;
+        currentTime += dt; // here? shouldn't be...
+        let time = new Date(currentTime);
+        secs.innerHTML = pad(time.getSeconds());
+        lastUpdateTime = now;
+    }
+    function startTimer() {
+        if(!interval) {
+            lastUpdateTime = new Date().getTime();
+            interval = setInterval(update, 1);
+        }
+    }
+    function stopTimer() {
+        clearInterval(interval);
+        interval = 0;
+    }
+});
 
 
 // MY STUFF -------------------------------------------------------------------
@@ -228,29 +266,33 @@ function drawAndWireUpGameBoard(rows, cols) {
         newCell = newCell.trim();
         template.innerHTML = newCell;
         newCell = template.content.firstChild;
+
         // ...lets us attach an event handler to it right away
         newCell.addEventListener('click', function() { // shit - just call the funciton itself
           game.uncover(newCell.dataset.row, newCell.dataset.col);
-          updateBoard(rows, cols);
+          redrawBoard(rows, cols);
           const status = game.getStatus();
           if (status.exploded)
             alert("KABOOM! Game over :(");
           else if (status.done)
             alert("You Win! WOOHOO!!");
         });
-        newCell.addEventListener('contextmenu', function() { // shit - just call the funciton itself
+
+        newCell.addEventListener('contextmenu', function(e) { // shit - just call the funciton itself
           game.mark(newCell.dataset.row, newCell.dataset.col);
-          updateBoard(rows, cols);
+          redrawBoard(rows, cols);
+          e.preventDefault(); // prevent menu
         });
         // ...before we add it to the game board
         boardSpace.appendChild(newCell);
     } // j
   } // i 
 } // f
-drawAndWireUpGameBoard(8,10);
+//drawAndWireUpGameBoard(8,10);
+drawAndWireUpGameBoard(14,18);
 
 
-function updateBoard(rows, cols) {
+function redrawBoard(rows, cols) {
   let board = game.getRendering();
   for (let i = 0; i < rows; i++) {
     for (let j = 0; j < cols; j++) {
@@ -260,26 +302,33 @@ function updateBoard(rows, cols) {
       if (content === "M")
         cell.style.background = "black";
       else if (content === "H")
-        console.log("placeholder code for now");
-      else if (content === "F")
-        cell.style.background = "red";
+      cell.style.background = (i+j) % 2 === 0 ? "#aad751" : "#a2d149";
+      else if (content === "F") {
+        //const temp = cell.style.backgroundColor;
+        //cell.innerHTML = '<img src="flag.png" />';
+        cell.style.backgroundImage = 'url("flag2.png")';
+
+      }
       else { // number
         cell.style.background = (i+j) % 2 === 0 ? "#e5c29f" : "#d7b899";
         if (content !== "0") {
           cell.innerText = content;
         if (content === "1")
-            cell.style.color = "blue";
+            cell.style.color = "#1976d2";
         else if (content === "2")
-            cell.style.color = "green";
+            cell.style.color = "#388e3c";
         else if (content === '3')
-            cell.style.color = "green";
+            cell.style.color = "#d32f2f";
         else if (content === '4')
-          cell.style.color = "purple";
+          cell.style.color = "#7b1fa2";
+        else if (content === '5')
+          cell.style.color = "#ff8f00";
         }
       }
     } // j
   } // i
 } // f
+
 
 
 
